@@ -39,7 +39,7 @@ export default async function textToSpeech(req: NextApiRequest, res: NextApiResp
         const mytime = Date.now()
         // UPLOAD TO S3
         const params = {
-          Bucket: 'realchat',
+          Bucket: 'realchat-mp3s',
           Key: `audio-${mytime}.mp3`, // provide a unique key for each file
           ContentType: 'audio/mpeg',
           Body: speechDetails.data,
