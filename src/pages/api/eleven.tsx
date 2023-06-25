@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function textToSpeech(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const API_KEY = '85064ec38a0d4a3074abdb94c75359f5';
+    const API_KEY = process.env.API_KEY;
     const VOICE_ID = 'Lfush8lZN9F1xAjh8pqx';
     const { prompts } = req.body;
 

@@ -22,6 +22,7 @@
         "@vercel/analytics": "^1.0.1",
         "aws-sdk": "^2.1365.0",
         "axios": "^1.4.0",
+        "env": "^0.0.2",
         "eslint": "8.39.0",
         "eslint-config-next": "13.3.1",
         "file-loader": "^6.2.0",
