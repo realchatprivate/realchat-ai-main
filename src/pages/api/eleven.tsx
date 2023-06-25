@@ -44,6 +44,8 @@ export default async function textToSpeech(req: NextApiRequest, res: NextApiResp
           ContentType: 'audio/mpeg',
           Body: speechDetails.data,
         };
+        
+        // Upload to S3
 
         try {
           const s3Response = await s3.upload(params).promise();
