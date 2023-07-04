@@ -33,18 +33,18 @@ import {
   TableCaption,
   TableContainer,
 } from '@chakra-ui/react';
-
+import axios from "axios";
+import Cookies from 'universal-cookie';
 
 export default function Home() {
   const [array, setArray] = useState([]);
   const [prompt, setPrompt] = useState("Hi {FirstName} {LastName}! I heard you like {Interests}. Your number is {Phone}.");
   const [mp3, setMp3] = useState([]);
+  const [mp3Uploaded, setMp3Uploaded] = useState([]);
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
-  const [mp3Loaded, setMp3Loaded] = useState(false);
-  const [forwardNumber, setForwardNumber] = useState('')
-  const handleChange = (event) => setForwardNumber(event.target.value)
 
+  const cookies = new Cookies();
 
   const onChangeHandler = (event) => {
     setFile(event.target.files[0]);
@@ -101,44 +101,23 @@ export default function Home() {
   const [err, setErr] = useState("");
 
 
-  const sendCampaignUrl = async ({mp3, phone}) => {
-    if (!forwardNumber) {
-      console.log("No forward number")
-      setErr("No forward number")
-      return;
-    }
-    console.log(array);
-    console.log(forwardNumber);
-    console.log(mp3);
-    console.log(phone);
-    var formdata = new FormData();
-    formdata.append("c_uid", process.env.C_UID);
-    formdata.append("c_password", process.env.C_PASSWORD);
-    formdata.append("c_callerID", forwardNumber);
-    formdata.append("c_phone", phone);
-    formdata.append("c_url", mp3);
-    formdata.append("c_audio", "mp3");
-    formdata.append("c_date", "now");
-    formdata.append("c_method", "new_campaign");
-    formdata.append("mobile_only", "1");
+  const sendCampaignUrl = async ({mp3Url, firstName, lastName}) => {
+    const dialerLogin = cookies.get('dialerLogin')
+    const dialerToken = cookies.get('dialerToken')
+    const result = await axios.post('/api/uploadAudio', { mp3Url, firstName, lastName, dialerLogin, dialerToken });
 
-    var requestOptions = {
-      method: 'POST',
-      body: formdata,
-      redirect: 'follow'
-    };
-    
-    // fetch("https://www.slybroadcast.com/gateway/vmb.adv.json.php", requestOptions)
-    
-    fetch("https://cors-anywhere.herokuapp.com/https://www.slybroadcast.com/gateway/vmb.adv.json.php", requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
+    if (result.status === 200) {
+      setMp3Uploaded([...mp3Uploaded, mp3Url])
+    }
+  }
+
+  const goToDashboard = () => {
+    window.open('https://dialer.realchat.ai/');
   }
 
   return (
     <Box paddingY={20} className="w-3/4 mx-auto">
-      <Text className="text-red-500 text-4xl text-center font-bold pb-5">RealChat.ai</Text>
+      <Text className="text-purple-500 text-4xl text-center font-bold pb-5">RealChat.ai</Text>
       <form className="input-field">
         <Textarea 
           onChange={(event) => setPrompt(event.target.value)}
@@ -157,13 +136,13 @@ export default function Home() {
                   onChange={onChangeHandler}
                   style={{ width: '100%' }}
               />
-              <div className="my-5 text-red-500 flex items-center text-center justify-center p-4 bg-input border-dotted border-dotted-color border-2 rounded-md" style={{ borderWidth: '2px', borderStyle: 'dotted', borderColor: 'currentColor', borderRadius: '0.5rem', width: '100%' }}>
+              <div className="my-5 text-purple-500 flex items-center text-center justify-center p-4 bg-input border-dotted border-dotted-color border-2 rounded-md" style={{ borderWidth: '2px', borderStyle: 'dotted', borderColor: 'currentColor', borderRadius: '0.5rem', width: '100%' }}>
                   <span>{file ? file.name : 'Upload your contacts.csv'}</span>
               </div>
           </label>
           <Button
             type="button"
-            colorScheme="red"
+            colorScheme="purple"
             className="w-full"
             {...(array.length === 0 && { disabled: true })}
             onClick={() => fetchRequest({ prompt: prompt, users: array })}
@@ -172,13 +151,6 @@ export default function Home() {
           </Button>
         </div>
       </form>
-      <Input
-        value={forwardNumber}
-        onChange={handleChange}
-        placeholder='Number to forward to'
-        className="my-3"
-      />
-      {/* <Text>{forwardNumber}</Text> */}
       <TableContainer>
       <Table variant='simple'>
         <Thead>
@@ -187,7 +159,7 @@ export default function Home() {
               <Th key={index} style={{ textTransform: 'none' }}>{columnName.toString()}</Th>
             ))}
             {array.length > 0 && <Th>MP3</Th>}
-            {array.length > 0 && <Th>Send Voicemail</Th>}
+            {array.length > 0 && <Th>ACTIONS</Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -200,7 +172,7 @@ export default function Home() {
                 <Td>
                 <Button
                   className="w-full"
-                  colorScheme={mp3.length !== 0 && "red"}
+                  colorScheme={mp3.length !== 0 && "purple"}
                   onClick={() => handlePlay(mp3[index])}
                 >
                   PLAY
@@ -210,9 +182,16 @@ export default function Home() {
               {mp3.length !== 0 && 
                 <Td>
                   <Button className="w-full" 
-                    colorScheme='red'
-                    onClick={() => sendCampaignUrl({mp3: mp3[index], phone: person['Phone']})}>
-                      SEND CAMPAIGN
+                    colorScheme='purple'
+                    onClick={() => {
+                      console.log(person['FirstName'])
+                      console.log(person['LastName'])
+                      console.log(mp3[index])
+                      mp3Uploaded.includes(mp3[index]) ?
+                      goToDashboard() :
+                      sendCampaignUrl({mp3Url: mp3[index], firstName: person['FirstName'], lastName: person['LastName']}) }
+                      }>
+                      { mp3Uploaded.includes(mp3[index]) ? "Go To Dashboard" : "Upload Audio" }
                   </Button>
                   {/* <Checkbox defaultChecked></Checkbox> */}
                 </Td>
@@ -223,7 +202,7 @@ export default function Home() {
       </Table>
     </TableContainer>
     {err != "" && 
-        <Text className="pt-10 text-center w-full mx-auto text-red-500 font-bold text-3xl">Error: {err}</Text>
+        <Text className="pt-10 text-center w-full mx-auto text-purple-500 font-bold text-3xl">Error: {err}</Text>
     }
     </Box>
   );

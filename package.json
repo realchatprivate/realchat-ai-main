@@ -40,6 +40,7 @@
         "twilio": "^4.13.0",
         "typescript": "5.0.4",
         "typewriter-effect": "^2.19.0",
+        "universal-cookie": "^4.0.4",
         "url-loader": "^4.1.1",
         "use-sound": "^4.0.1"
     },

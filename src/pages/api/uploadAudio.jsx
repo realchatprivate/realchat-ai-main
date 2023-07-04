@@ -21,19 +21,18 @@ const downloadFile = (url, dest) =>
       })
   })
 
-const uploadFile = async (filePath, fileName) => {
+const uploadFile = async (filePath, fileName, dialerLogin, dialerToken) => {
   // Read the file from filesystem
+  console.log(dialerLogin, dialerToken)
   const fileStream = fs.createReadStream(filePath)
-
   // Create a form
   const form = new FormData()
   form.append('name', fileName)
   form.append('audio_file', fileStream)
-  form.append('user_id', '1')
 
   // Calculate Base64 for Authorization
   const base64Credentials = Buffer.from(
-    `${process.env.DIALERAI_BASIC_AUTH_LOGIN}:${process.env.DIALERAI_BASIC_AUTH_PASSWORD}`
+    `${dialerLogin}:${dialerToken}`
   ).toString('base64')
 
   // Make the API request
@@ -56,14 +55,16 @@ const uploadFile = async (filePath, fileName) => {
 
 export default async function handler (req, res) {
   try {
-    const { phone, firstName, lastName, url } = req.body
+    const { firstName, lastName, mp3Url, dialerLogin, dialerToken } = req.body
 
-    const fileName = `${firstName} ${lastName} - ${phone}`
+    console.log(firstName, lastName, mp3Url, dialerLogin, dialerToken)
 
-    const filePath = path.resolve('./', path.basename(url))
+    const fileName = `${firstName} ${lastName}`
 
-    await downloadFile(url, filePath)
-    const result = await uploadFile(filePath, fileName)
+    const filePath = path.resolve('./', path.basename(mp3Url))
+
+    await downloadFile(mp3Url, filePath)
+    const result = await uploadFile(filePath, fileName, dialerLogin, dialerToken)
     res.status(200).json(result)
   } catch (error) {
     res.status(500).json({ error: error.message })
