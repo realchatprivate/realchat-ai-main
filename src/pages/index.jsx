@@ -109,129 +109,142 @@ export default function Home () {
     window.open('https://dialer.realchat.ai/')
   }
 
-  return (
-    <Box paddingY={20} className='w-3/4 mx-auto'>
+  const isBlank = (str) => (!str || /^\s*$/.test(str));
+
+  if (
+    isBlank(cookies.get('dialerLogin')) ||
+    isBlank(cookies.get('dialerToken'))
+  ) {
+    return (
       <Text className='text-purple-500 text-4xl text-center font-bold pb-5'>
-        RealChat.ai
+        An admin needs to set up your account to allow you to use this interface.
       </Text>
-      <form className='input-field'>
-        <Textarea
-          onChange={event => setPrompt(event.target.value)}
-          value={prompt}
-          placeholder="Hi {FirstName}! How are you? I'm calling to see if you..."
-          rows={5}
-          cols={48}
-        />
-        <div className='py-5'>
-          <label className='file-input' style={{ width: '100%' }}>
-            <input
-              type='file'
-              name='file'
-              accept='.csv'
-              className='hidden'
-              onChange={onChangeHandler}
-              style={{ width: '100%' }}
-            />
-            <div
-              className='my-5 text-purple-500 flex items-center text-center justify-center p-4 bg-input border-dotted border-dotted-color border-2 rounded-md'
-              style={{
-                borderWidth: '2px',
-                borderStyle: 'dotted',
-                borderColor: 'currentColor',
-                borderRadius: '0.5rem',
-                width: '100%'
-              }}
-            >
-              <span>{file ? file.name : 'Upload your contacts.csv'}</span>
-            </div>
-          </label>
-          <Button
-            type='button'
-            colorScheme='purple'
-            className='w-full'
-            {...(array.length === 0 && { disabled: true })}
-            onClick={() => fetchRequest({ prompt: prompt, users: array })}
-          >
-            {loading ? 'Loading...' : 'Generate Speech'}
-          </Button>
-        </div>
-      </form>
-      <TableContainer>
-        <Table variant='simple'>
-          <Thead>
-            <Tr>
-              {array.length > 0 &&
-                Object.keys(array[0]).map((columnName, index) => (
-                  <Th key={index} style={{ textTransform: 'none' }}>
-                    {columnName.toString()}
-                  </Th>
-                ))}
-              {array.length > 0 && <Th>MP3</Th>}
-              {array.length > 0 && <Th>ACTIONS</Th>}
-            </Tr>
-          </Thead>
-          <Tbody>
-            {array.map((person, index) => (
-              <Tr key={index}>
-                {Object.keys(person).map((key, keyIndex) => (
-                  <Td key={keyIndex}>{person[key]}</Td>
-                ))}
-                {mp3.length !== 0 && (
-                  <Td>
-                    <Button
-                      className='w-full'
-                      colorScheme={mp3.length !== 0 && 'purple'}
-                      onClick={() => handlePlay(mp3[index])}
-                    >
-                      PLAY
-                    </Button>
-                  </Td>
-                )}
-                {mp3.length !== 0 && (
-                  <Td>
-                    {loadingMp3Uploading.includes(mp3[index]) ? (
-                      <Button
-                        className='w-full'
-                        colorScheme='purple'
-                        disabled={true}
-                      >
-                        Loading...
-                      </Button>
-                    ) : (
-                      <Button
-                        className='w-full'
-                        colorScheme='purple'
-                        onClick={() => {
-                          console.log(person['FirstName'])
-                          console.log(person['LastName'])
-                          console.log(mp3[index])
-                          mp3Uploaded.includes(mp3[index])
-                            ? goToDashboard()
-                            : sendCampaignUrl({
-                                mp3Url: mp3[index],
-                                firstName: person['FirstName'],
-                                lastName: person['LastName']
-                              })
-                        }}
-                      >
-                        {mp3Uploaded.includes(mp3[index])
-                          ? 'Go To Dashboard'
-                          : 'Upload Audio'}
-                      </Button>
-                    )}
-                    {/* <Checkbox defaultChecked></Checkbox> */}
-                  </Td>
-                )}
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      </TableContainer>
-      {err != '' && (
-        <Text className='pt-10 text-center w-full mx-auto text-purple-500 font-bold text-3xl'>
-          Error: {err}
+    )
+  } else {
+    return (
+      <Box paddingY={20} className='w-3/4 mx-auto'>
+        <Text className='text-purple-500 text-4xl text-center font-bold pb-5'>
+          RealChat.ai
         </Text>
-      )}
-    </Box>
-  )
+        <form className='input-field'>
+          <Textarea
+            onChange={event => setPrompt(event.target.value)}
+            value={prompt}
+            placeholder="Hi {FirstName}! How are you? I'm calling to see if you..."
+            rows={5}
+            cols={48}
+          />
+          <div className='py-5'>
+            <label className='file-input' style={{ width: '100%' }}>
+              <input
+                type='file'
+                name='file'
+                accept='.csv'
+                className='hidden'
+                onChange={onChangeHandler}
+                style={{ width: '100%' }}
+              />
+              <div
+                className='my-5 text-purple-500 flex items-center text-center justify-center p-4 bg-input border-dotted border-dotted-color border-2 rounded-md'
+                style={{
+                  borderWidth: '2px',
+                  borderStyle: 'dotted',
+                  borderColor: 'currentColor',
+                  borderRadius: '0.5rem',
+                  width: '100%'
+                }}
+              >
+                <span>{file ? file.name : 'Upload your contacts.csv'}</span>
+              </div>
+            </label>
+            <Button
+              type='button'
+              colorScheme='purple'
+              className='w-full'
+              {...(array.length === 0 && { disabled: true })}
+              onClick={() => fetchRequest({ prompt: prompt, users: array })}
+            >
+              {loading ? 'Loading...' : 'Generate Speech'}
+            </Button>
+          </div>
+        </form>
+        <TableContainer>
+          <Table variant='simple'>
+            <Thead>
+              <Tr>
+                {array.length > 0 &&
+                  Object.keys(array[0]).map((columnName, index) => (
+                    <Th key={index} style={{ textTransform: 'none' }}>
+                      {columnName.toString()}
+                    </Th>
+                  ))}
+                {array.length > 0 && <Th>MP3</Th>}
+                {array.length > 0 && <Th>ACTIONS</Th>}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {array.map((person, index) => (
+                <Tr key={index}>
+                  {Object.keys(person).map((key, keyIndex) => (
+                    <Td key={keyIndex}>{person[key]}</Td>
+                  ))}
+                  {mp3.length !== 0 && (
+                    <Td>
+                      <Button
+                        className='w-full'
+                        colorScheme={mp3.length !== 0 && 'purple'}
+                        onClick={() => handlePlay(mp3[index])}
+                      >
+                        PLAY
+                      </Button>
+                    </Td>
+                  )}
+                  {mp3.length !== 0 && (
+                    <Td>
+                      {loadingMp3Uploading.includes(mp3[index]) ? (
+                        <Button
+                          className='w-full'
+                          colorScheme='purple'
+                          disabled={true}
+                        >
+                          Loading...
+                        </Button>
+                      ) : (
+                        <Button
+                          className='w-full'
+                          colorScheme='purple'
+                          onClick={() => {
+                            console.log(person['FirstName'])
+                            console.log(person['LastName'])
+                            console.log(mp3[index])
+                            mp3Uploaded.includes(mp3[index])
+                              ? goToDashboard()
+                              : sendCampaignUrl({
+                                  mp3Url: mp3[index],
+                                  firstName: person['FirstName'],
+                                  lastName: person['LastName']
+                                })
+                          }}
+                        >
+                          {mp3Uploaded.includes(mp3[index])
+                            ? 'Go To Dashboard'
+                            : 'Upload Audio'}
+                        </Button>
+                      )}
+                      {/* <Checkbox defaultChecked></Checkbox> */}
+                    </Td>
+                  )}
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </TableContainer>
+        {err != '' && (
+          <Text className='pt-10 text-center w-full mx-auto text-purple-500 font-bold text-3xl'>
+            Error: {err}
+          </Text>
+        )}
+      </Box>
+    )
+  }
 }
