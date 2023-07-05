@@ -15,7 +15,6 @@ import {
   TableContainer
 } from '@chakra-ui/react'
 import axios from 'axios'
-import Cookies from 'universal-cookie'
 import Image from 'next/image'
 
 export default function Home () {
@@ -28,15 +27,16 @@ export default function Home () {
   const [loadingMp3Uploading, setLoadingMp3Uploading] = useState([])
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState(null)
-  const [cookiesDefined, setCookiesDefined] = useState(false)
-
-  const cookies = new Cookies()
+  const [searchParamsDefined, setParamsDefined] = useState(false)
 
   useEffect(() => {
-    if (!isBlank(cookies.get('dialerLogin')) && !isBlank(cookies.get('dialerToken')) ) {
-      setCookiesDefined(true)
+    const params = new URLSearchParams(window.location.search) // id=123
+    const dialerLogin = params.get('dialerLogin')
+    const dialerToken = params.get('dialerToken')
+    if (!isBlank(dialerLogin) && !isBlank(dialerToken) ) {
+      setParamsDefined(true)
     }
-  }, [cookies])
+  }, [])
 
   const onChangeHandler = event => {
     setFile(event.target.files[0])
@@ -96,8 +96,10 @@ export default function Home () {
   const [err, setErr] = useState('')
 
   const sendCampaignUrl = async ({ mp3Url, firstName, lastName }) => {
-    const dialerLogin = cookies.get('dialerLogin')
-    const dialerToken = cookies.get('dialerToken')
+    const params = new URLSearchParams(window.location.search) // id=123
+    const dialerLogin = params.get('dialerLogin')
+    const dialerToken = params.get('dialerToken')
+    
     setLoadingMp3Uploading([...loadingMp3Uploading, mp3Url])
     const result = await axios.post('/api/uploadAudio', {
       mp3Url,
@@ -130,10 +132,10 @@ export default function Home () {
         alt="My Image"
       />
       </div>
-      { !cookiesDefined && <Text className='text-purple-900 text-4xl text-center font-bold pb-5'>
+      { !searchParamsDefined && <Text className='text-purple-900 text-4xl text-center font-bold pb-5'>
        An admin needs to set up your account to allow you to use this interface.
       </Text> }
-      {cookiesDefined && (
+      {searchParamsDefined && (
         <>
           <form className='input-field'>
             <Textarea
