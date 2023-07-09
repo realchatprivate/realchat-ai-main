@@ -47,12 +47,9 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
     console.log(err.message);
     throw err.message
   }
-
-
-  return response.data
 }
 
-export default async function runUploadAudio ({ firstName, lastName, mp3Url, dialerLogin, dialerToken }) {
+export default async function runCreateAudio ({ firstName, lastName, mp3Url, dialerLogin, dialerToken }) {
     const fileName = `${Date.now()} ${firstName} ${lastName}`
 
     console.log(dialerLogin)

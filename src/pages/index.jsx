@@ -95,18 +95,19 @@ export default function Home () {
 
   const [err, setErr] = useState('')
 
-  const sendCampaignUrl = async ({ mp3Url, firstName, lastName }) => {
+  const sendCampaignUrl = async ({ mp3Url, firstName, lastName, phone }) => {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
     
     setLoadingMp3Uploading([...loadingMp3Uploading, mp3Url])
-    const result = await axios.post('/api/uploadAudio', {
+    const result = await axios.post('/api/sendAudio', {
       mp3Url,
       firstName,
       lastName,
       dialerLogin,
-      dialerToken
+      dialerToken,
+      phone
     })
     setLoadingMp3Uploading(loadingMp3Uploading.filter(item => item !== mp3Url))
 
@@ -233,7 +234,8 @@ export default function Home () {
                                 : sendCampaignUrl({
                                     mp3Url: mp3[index],
                                     firstName: person['FirstName'],
-                                    lastName: person['LastName']
+                                    lastName: person['LastName'],
+                                    phone: person['Phone']
                                   })
                             }}
                           >

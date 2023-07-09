@@ -10,7 +10,7 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
       user: '/rest-api/users/1/'
     }
 
-    const response = await axios({
+    const createSurveyResponse = await axios({
       method: 'post',
       url: 'https://dialer.realchat.ai/rest-api/survey-template/',
       data: createSurveyBody,
@@ -25,12 +25,12 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
       type: '7',
       audiofile: 'http://dialer.realchat.ai/rest-api/audio-files/47/',
       question: 'Play aydio',
-      survey: response.data.url,
+      survey: createSurveyResponse.data.url,
       order: 1,
       queue: null
     }
 
-    const responseSurvey = await axios({
+    const createSectionResponse = await axios({
       method: 'post',
       url: 'https://dialer.realchat.ai/rest-api/section-template/',
       data: createSurveySectionBody,
@@ -41,10 +41,11 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
       maxRedirects: 0
     })
 
-    console.log(responseSurvey.data.url)
+    console.log(createSurveyResponse.data.url)
 
-    return response.data
+    return createSurveyResponse.data
   } catch (err) {
+    console.log('create survey failed')
     throw err.message
   }
 }

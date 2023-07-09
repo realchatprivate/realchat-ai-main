@@ -1,21 +1,51 @@
-import runUploadAudio from './uploadAudio'
+import runCreateAudio from './createAudio'
 import runCreateSurvey from './createSurvey'
+import runCreatePhonebook from './createPhonebook'
+import runCreateCampaign from './createCampaign'
 
 export default async function handler (req, res) {
-    try {
-      const { firstName, lastName, mp3Url, dialerLogin, dialerToken } = req.body
-  
-      const uploadAudioAnswer = await runUploadAudio({ firstName, lastName, mp3Url, dialerLogin, dialerToken})
-      const createSurverAnswer = await runCreateSurvey({ dialerLogin, dialerToken });
+  try {
+    const { firstName, lastName, mp3Url, dialerLogin, dialerToken, phone } = req.body
 
-      console.log(`upload audio answer `)
-      console.log(uploadAudioAnswer)
-      console.log(`create survey answer `)
-      console.log(createSurverAnswer)
+    const uploadAudioResponse = await runCreateAudio({
+      firstName,
+      lastName,
+      mp3Url,
+      dialerLogin,
+      dialerToken
+    })
+    const createSurveyResponse = await runCreateSurvey({
+      dialerLogin,
+      dialerToken
+    })
+    const createPhonebookResponse = await runCreatePhonebook({
+      dialerLogin,
+      dialerToken,
+      firstName,
+      lastName,
+      phone
+    })
 
-      res.status(200).json(uploadAudioAnswer)
-    } catch (error) {
-      res.status(500).json({ error })
-    }
+    const regex = /\/(\d+)\//
+    const match = createSurveyResponse.url.match(regex)
+    const surveyId = match ? match[1] : null
+
+    const createCampaignResponse = await runCreateCampaign({
+      phonebook: createPhonebookResponse.url,
+      survey: surveyId
+    })
+
+    console.log(`upload audio response `)
+    console.log(uploadAudioResponse)
+    console.log(`create survey response `)
+    console.log(createSurveyResponse)
+    console.log(`create phonebook response `)
+    console.log(createPhonebookResponse)
+    console.log(`create campaign response `)
+    console.log(createCampaignResponse)
+
+    res.status(200).json(createCampaignResponse)
+  } catch (error) {
+    res.status(500).json({ error })
   }
-  
+}
