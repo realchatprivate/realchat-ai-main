@@ -1,4 +1,7 @@
 /** @type {import('next').NextConfig} */
+
+const { initialize } = require("next/dist/server/lib/render-server");
+
 const nextConfig = {
 	env: {
 		AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
