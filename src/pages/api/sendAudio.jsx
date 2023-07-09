@@ -5,7 +5,8 @@ import runCreateCampaign from './sendAudio/createCampaign'
 
 export default async function handler (req, res) {
   try {
-    const { firstName, lastName, mp3Url, dialerLogin, dialerToken, phone } = req.body
+    const { firstName, lastName, mp3Url, dialerLogin, dialerToken, phone } =
+      req.body
 
     const uploadAudioResponse = await runCreateAudio({
       firstName,
@@ -36,15 +37,6 @@ export default async function handler (req, res) {
       survey: surveyId,
       audio: uploadAudioResponse.id
     })
-
-    console.log(`upload audio response `)
-    console.log(uploadAudioResponse)
-    console.log(`create survey response `)
-    console.log(createSurveyResponse)
-    console.log(`create phonebook response `)
-    console.log(createPhonebookResponse)
-    console.log(`create campaign response `)
-    console.log(createCampaignResponse)
 
     res.status(200).json(createCampaignResponse)
   } catch (error) {

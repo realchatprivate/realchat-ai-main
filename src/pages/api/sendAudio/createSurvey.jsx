@@ -1,13 +1,20 @@
 import { callDialerApi } from './api'
 
-export default async function runCreateSurvey ({ dialerLogin, dialerToken, audio }) {
+export default async function runCreateSurvey ({
+  dialerLogin,
+  dialerToken,
+  audio
+}) {
   try {
     const createSurveyBody = {
       name: Date.now().toString(),
       user: '/rest-api/users/1/'
     }
 
-    const createSurveyResponse = await callDialerApi("survey-template/", createSurveyBody)
+    const createSurveyResponse = await callDialerApi(
+      'survey-template/',
+      createSurveyBody
+    )
 
     const createSurveySectionBody = {
       type: '1',
@@ -17,7 +24,7 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken, audio
       queue: null
     }
 
-    await callDialerApi("section-template/", createSurveySectionBody)
+    await callDialerApi('section-template/', createSurveySectionBody)
 
     return createSurveyResponse
   } catch (err) {
