@@ -32,7 +32,6 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
     const response = await axios({
       method: 'post',
       url: 'https://dialer.realchat.ai/rest-api/audio-files/',
-      // user: '/rest-api/users/2/',
       data: form,
       headers: {
         Accept: 'application/json',
