@@ -2,25 +2,22 @@ import * as https from 'https'
 import FormData from 'form-data'
 import axios from 'axios'
 
-const downloadFile = url =>
-  new Promise((resolve, reject) => {
-    let data = []
-    
-    https
-      .get(url, res => {
-        res
-          .on('data', chunk => {
-            data.push(chunk)
-          })
-          .on('end', () => {
-            resolve(Buffer.concat(data))
-          })
-      })
-      .on('error', err => {
-        console.log(err.message)
-        reject(err.message)
-      })
-  })
+const downloadFile = async (url) => {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: url,
+      responseType: 'arraybuffer' // to handle binary data
+    });
+
+    return Buffer.from(response.data, 'binary');
+  } catch (err) {
+    console.log('download failed')
+    console.log(err.message);
+    throw err;
+  }
+}
+
 
 const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
   const form = new FormData()
@@ -31,27 +28,35 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
     `${dialerLogin}:${dialerToken}`
   ).toString('base64')
 
-  const response = await axios({
-    method: 'post',
-    url: 'https://dialer.realchat.ai/rest-api/audio-files/',
-    // user: '/rest-api/users/2/',
-    data: form,
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Basic ${base64Credentials}`,
-      ...form.getHeaders()
-    },
-    maxRedirects: 0
-  }).catch((error) => console.log(error))
+  try {
+    const response = await axios({
+      method: 'post',
+      url: 'https://dialer.realchat.ai/rest-api/audio-files/',
+      // user: '/rest-api/users/2/',
+      data: form,
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Basic ${base64Credentials}`,
+        ...form.getHeaders()
+      },
+      maxRedirects: 0
+    })
+    return response.data
+  } catch (err) {
+    console.log('upload failed')
+    console.log(err.message);
+    throw err
+  }
+
 
   return response.data
 }
 
-export default async function handler (req, res) {
-  try {
-    const { firstName, lastName, mp3Url, dialerLogin, dialerToken } = req.body
+export default async function runUploadAudio ({ firstName, lastName, mp3Url, dialerLogin, dialerToken }) {
+    const fileName = `${Date.now()} ${firstName} ${lastName}`
 
-    const fileName = `${firstName} ${lastName}`
+    console.log(dialerLogin)
+    console.log(dialerToken)
 
     const fileBuffer = await downloadFile(mp3Url)
     const result = await uploadFile(
@@ -60,8 +65,5 @@ export default async function handler (req, res) {
       dialerLogin,
       dialerToken
     )
-    res.status(200).json(result)
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
+    return result;
 }
