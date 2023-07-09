@@ -14,7 +14,7 @@ const downloadFile = async (url) => {
   } catch (err) {
     console.log('download failed')
     console.log(err.message);
-    throw err;
+    throw err.message;
   }
 }
 
@@ -45,7 +45,7 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
   } catch (err) {
     console.log('upload failed')
     console.log(err.message);
-    throw err
+    throw err.message
   }
 
 
