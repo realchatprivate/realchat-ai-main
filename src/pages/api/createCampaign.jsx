@@ -1,8 +1,9 @@
 const axios = require('axios')
-export default async function runCreateCampaign ({ phonebook, survey }) {
+export default async function runCreateCampaign ({ phonebook, survey, audio }) {
   console.log("start creating campaign")
   console.log(phonebook)
   console.log(survey)
+  console.log(audio)
   try {
     const data = {
       name: Date.now().toString(),
@@ -11,12 +12,14 @@ export default async function runCreateCampaign ({ phonebook, survey }) {
       object_id: survey,
       user: '/rest-api/users/1/',
       status: 1,
-      callerid: '+6034848251',
       phonebook: [
           phonebook
       ],
       xfer_gateway: "http://dialer.realchat.ai/rest-api/gateway/2/",
       aleg_gateway: "http://dialer.realchat.ai/rest-api/gateway/2/",
+      voicemail: true,
+      voicemail_audiofile: `http://dialer.realchat.ai/rest-api/audio-files/${audio}/`,
+      voicemail_tts: null,
     }
 
 

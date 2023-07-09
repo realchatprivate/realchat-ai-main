@@ -1,5 +1,5 @@
 const axios = require('axios')
-export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
+export default async function runCreateSurvey ({ dialerLogin, dialerToken, audio }) {
   try {
     const base64Credentials = Buffer.from(
       `${process.env.DIALERAI_BASIC_AUTH_LOGIN}:${process.env.DIALERAI_BASIC_AUTH_PASSWORD}`
@@ -22,15 +22,14 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
     })
 
     const createSurveySectionBody = {
-      type: '7',
-      audiofile: 'http://dialer.realchat.ai/rest-api/audio-files/47/',
-      question: 'Play aydio',
+      type: '1',
+      audiofile: `http://dialer.realchat.ai/rest-api/audio-files/${audio}/`,
+      question: 'Play audio',
       survey: createSurveyResponse.data.url,
-      order: 1,
       queue: null
     }
 
-    const createSectionResponse = await axios({
+    await axios({
       method: 'post',
       url: 'https://dialer.realchat.ai/rest-api/section-template/',
       data: createSurveySectionBody,
@@ -40,8 +39,7 @@ export default async function runCreateSurvey ({ dialerLogin, dialerToken }) {
       },
       maxRedirects: 0
     })
-
-    console.log(createSurveyResponse.data.url)
+  
 
     return createSurveyResponse.data
   } catch (err) {

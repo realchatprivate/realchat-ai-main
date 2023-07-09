@@ -22,7 +22,7 @@ const downloadFile = async (url) => {
 const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
   const form = new FormData()
   form.append('name', fileName)
-  form.append('audio_file', fileBuffer, { filename: fileName })
+  form.append('audio_file', fileBuffer, { filename: `${fileName}.mp3` })
 
   const base64Credentials = Buffer.from(
     `${dialerLogin}:${dialerToken}`
