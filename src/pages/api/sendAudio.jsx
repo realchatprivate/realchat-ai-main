@@ -1,7 +1,7 @@
-import runCreateAudio from './createAudio'
-import runCreateSurvey from './createSurvey'
-import runCreatePhonebook from './createPhonebook'
-import runCreateCampaign from './createCampaign'
+import runCreateAudio from './sendAudio/createAudio'
+import runCreateSurvey from './sendAudio/createSurvey'
+import runCreatePhonebook from './sendAudio/createPhonebook'
+import runCreateCampaign from './sendAudio/createCampaign'
 
 export default async function handler (req, res) {
   try {

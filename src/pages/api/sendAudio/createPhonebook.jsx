@@ -50,5 +50,3 @@ export default async function runCreatePhonebook ({ dialerLogin, dialerToken, fi
     throw err.message
   }
 }
-
-// curl -u root:5bo47cRTo16@ --dump-header - -H "Content-Type:application/json" -X POST --data '{"contact": "+34650787878", "full_name": "Areski Belaid", "phonebook": "/rest-api/phonebook/20/", "additional_vars": "{"transfer_number": "0000001"}"}' https://dialer.realchat.ai/rest-api/contact/
