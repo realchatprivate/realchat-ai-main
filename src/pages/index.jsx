@@ -95,7 +95,31 @@ export default function Home () {
 
   const [err, setErr] = useState('')
 
-  const sendCampaignUrl = async ({ mp3Url, firstName, lastName, phone }) => {
+  const sendAllVoiceMessages = async () => {
+    console.log('sending voice message')
+    setLoading(true)
+    const params = new URLSearchParams(window.location.search) // id=123
+    const dialerLogin = params.get('dialerLogin')
+    const dialerToken = params.get('dialerToken')
+
+    for (const [index, person] of array.entries()) {
+      console.log(index)
+      console.log(mp3[index])
+      await axios.post('/api/sendAudio', {
+        mp3Url: mp3[index],
+        firstName: person['FirstName'],
+        lastName: person['LastName'],
+        dialerLogin: dialerLogin,
+        dialerToken: dialerToken,
+        phone: person['Phone']
+      })
+    }
+    setMp3Uploaded(mp3)
+    console.log('sending all messages finished')
+    setLoading(false)
+  }
+
+  const sendVoiceMessage = async ({ mp3Url, firstName, lastName, phone }) => {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
@@ -171,15 +195,31 @@ export default function Home () {
                   <span>{file ? file.name : 'Upload your contacts.csv'}</span>
                 </div>
               </label>
-              <Button
-                type='button'
-                colorScheme='purple'
-                className='w-full'
-                {...(array.length === 0 && { disabled: true })}
-                onClick={() => fetchRequest({ prompt: prompt, users: array })}
-              >
-                {loading ? 'Loading...' : 'Generate Speech'}
-              </Button>
+              {mp3.length > 0 ? (
+                <Button
+                  type='button'
+                  colorScheme='purple'
+                  className='w-full'
+                  isDisabled={loading || mp3Uploaded === mp3}
+                  onClick={sendAllVoiceMessages}
+                >
+                  {mp3Uploaded === mp3
+                    ? 'All audios sent'
+                    : loading
+                    ? 'Loading...'
+                    : 'Send all audios'}
+                </Button>
+              ) : (
+                <Button
+                  type='button'
+                  colorScheme='purple'
+                  className='w-full'
+                  isDisabled={array.length === 0}
+                  onClick={() => fetchRequest({ prompt: prompt, users: array })}
+                >
+                  {loading ? 'Loading...' : 'Generate Speech'}
+                </Button>
+              )}
             </div>
           </form>
           <TableContainer>
@@ -219,32 +259,44 @@ export default function Home () {
                           <Button
                             className='w-full'
                             colorScheme='purple'
-                            disabled={true}
+                            isDisabled={true}
                           >
                             Loading...
                           </Button>
                         ) : (
-                          <Button
-                            className='w-full'
-                            colorScheme='purple'
-                            onClick={() => {
-                              console.log(person['FirstName'])
-                              console.log(person['LastName'])
-                              console.log(mp3[index])
-                              mp3Uploaded.includes(mp3[index])
-                                ? goToDashboard()
-                                : sendCampaignUrl({
-                                    mp3Url: mp3[index],
-                                    firstName: person['FirstName'],
-                                    lastName: person['LastName'],
-                                    phone: person['Phone']
-                                  })
-                            }}
-                          >
-                            {mp3Uploaded.includes(mp3[index])
-                              ? 'Go To Dashboard'
-                              : 'Send'}
-                          </Button>
+                          <>
+                            {loading ? (
+                              <Button
+                                className='w-full'
+                                colorScheme='purple'
+                                isDisabled={true}
+                              >
+                                Loading...
+                              </Button>
+                            ) : (
+                              <Button
+                                className='w-full'
+                                colorScheme='purple'
+                                onClick={() => {
+                                  console.log(person['FirstName'])
+                                  console.log(person['LastName'])
+                                  console.log(mp3[index])
+                                  mp3Uploaded.includes(mp3[index])
+                                    ? goToDashboard()
+                                    : sendVoiceMessage({
+                                        mp3Url: mp3[index],
+                                        firstName: person['FirstName'],
+                                        lastName: person['LastName'],
+                                        phone: person['Phone']
+                                      })
+                                }}
+                              >
+                                {mp3Uploaded.includes(mp3[index])
+                                  ? 'Go To Dashboard'
+                                  : 'Send'}
+                              </Button>
+                            )}
+                          </>
                         )}
                         {/* <Checkbox defaultChecked></Checkbox> */}
                       </Td>
