@@ -33,7 +33,7 @@ export default function Home () {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
-    if (!isBlank(dialerLogin) && !isBlank(dialerToken) ) {
+    if (!isBlank(dialerLogin) && !isBlank(dialerToken)) {
       setParamsDefined(true)
     }
   }, [])
@@ -99,7 +99,7 @@ export default function Home () {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
-    
+
     setLoadingMp3Uploading([...loadingMp3Uploading, mp3Url])
     const result = await axios.post('/api/sendAudio', {
       mp3Url,
@@ -124,18 +124,20 @@ export default function Home () {
 
   return (
     <Box paddingY={20} className='w-3/4 mx-auto'>
-      <div class="items-center w-100 justify-center mb-5 flex">
-
-      <Image
-        src="/logo-realchat.png" // Route of the image file
-        height={50} // Desired size with correct aspect ratio
-        width={50} // Desired size with correct aspect ratio
-        alt="My Image"
-      />
+      <div class='items-center w-100 justify-center mb-5 flex'>
+        <Image
+          src='/logo-realchat.png' // Route of the image file
+          height={50} // Desired size with correct aspect ratio
+          width={50} // Desired size with correct aspect ratio
+          alt='My Image'
+        />
       </div>
-      { !searchParamsDefined && <Text className='text-purple-900 text-4xl text-center font-bold pb-5'>
-       An admin needs to set up your account to allow you to use this interface.
-      </Text> }
+      {!searchParamsDefined && (
+        <Text className='text-purple-900 text-4xl text-center font-bold pb-5'>
+          An admin needs to set up your account to allow you to use this
+          interface.
+        </Text>
+      )}
       {searchParamsDefined && (
         <>
           <form className='input-field'>
@@ -241,7 +243,7 @@ export default function Home () {
                           >
                             {mp3Uploaded.includes(mp3[index])
                               ? 'Go To Dashboard'
-                              : 'Upload Audio'}
+                              : 'Send'}
                           </Button>
                         )}
                         {/* <Checkbox defaultChecked></Checkbox> */}
