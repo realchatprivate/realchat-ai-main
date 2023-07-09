@@ -5,7 +5,7 @@ import axios from 'axios'
 const downloadFile = url =>
   new Promise((resolve, reject) => {
     let data = []
-
+    
     https
       .get(url, res => {
         res
@@ -17,6 +17,7 @@ const downloadFile = url =>
           })
       })
       .on('error', err => {
+        console.log(err.message)
         reject(err.message)
       })
   })
@@ -33,6 +34,7 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
   const response = await axios({
     method: 'post',
     url: 'https://dialer.realchat.ai/rest-api/audio-files/',
+    // user: '/rest-api/users/2/',
     data: form,
     headers: {
       Accept: 'application/json',
@@ -40,7 +42,7 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
       ...form.getHeaders()
     },
     maxRedirects: 0
-  })
+  }).catch((error) => console.log(error))
 
   return response.data
 }
