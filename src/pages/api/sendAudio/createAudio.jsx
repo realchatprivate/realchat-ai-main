@@ -1,6 +1,6 @@
-import * as https from 'https'
 import FormData from 'form-data'
 import axios from 'axios'
+import { callDialerApi } from './api';
 
 const downloadFile = async (url) => {
   try {
@@ -24,23 +24,13 @@ const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
   form.append('name', fileName)
   form.append('audio_file', fileBuffer, { filename: `${fileName}.mp3` })
 
-  const base64Credentials = Buffer.from(
-    `${dialerLogin}:${dialerToken}`
-  ).toString('base64')
-
   try {
-    const response = await axios({
-      method: 'post',
-      url: 'https://dialer.realchat.ai/rest-api/audio-files/',
-      data: form,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Basic ${base64Credentials}`,
-        ...form.getHeaders()
-      },
-      maxRedirects: 0
-    })
-    return response.data
+    const headers = {
+      ...form.getHeaders()
+    }
+    const response = await callDialerApi("audio-files/", form, headers)
+
+    return response
   } catch (err) {
     console.log('upload failed')
     console.log(err.message);

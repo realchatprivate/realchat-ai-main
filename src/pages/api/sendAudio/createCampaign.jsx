@@ -1,4 +1,5 @@
-const axios = require('axios')
+import { callDialerApi } from './api'
+
 export default async function runCreateCampaign ({ phonebook, survey, audio }) {
   console.log("start creating campaign")
   console.log(phonebook)
@@ -22,23 +23,9 @@ export default async function runCreateCampaign ({ phonebook, survey, audio }) {
       voicemail_tts: null,
     }
 
+    const response = await callDialerApi("campaigns/", data)
 
-    const base64Credentials = Buffer.from(
-        `${process.env.DIALERAI_BASIC_AUTH_LOGIN}:${process.env.DIALERAI_BASIC_AUTH_PASSWORD}`
-      ).toString('base64')
-
-    const response = await axios({
-        method: 'post',
-        url: 'https://dialer.realchat.ai/rest-api/campaigns/',
-        data: data,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Basic ${base64Credentials}`
-        },
-        maxRedirects: 0
-      })
-
-    return response.data
+    return response
   } catch (err) {
     console.log('create campaign failed')
     throw err.message

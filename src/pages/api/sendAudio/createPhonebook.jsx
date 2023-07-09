@@ -1,50 +1,26 @@
-const axios = require('axios')
+import { callDialerApi } from './api'
+
 export default async function runCreatePhonebook ({ dialerLogin, dialerToken, firstName, lastName, phone }) {
   try {
-    const base64Credentials = Buffer.from(
-      `${process.env.DIALERAI_BASIC_AUTH_LOGIN}:${process.env.DIALERAI_BASIC_AUTH_PASSWORD}`
-    ).toString('base64')
-
     const phonebookBody = {
       name: Date.now().toString(),
       user: '/rest-api/users/1/'
     }
 
-    const createPhonebookResponse = await axios({
-      method: 'post',
-      url: 'https://dialer.realchat.ai/rest-api/phonebook/',
-      data: phonebookBody,
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Basic ${base64Credentials}`
-      },
-      maxRedirects: 0
-    })
-
-    console.log(phone)
-    console.log(createPhonebookResponse.data.url)
+    const createPhonebookResponse = await callDialerApi("phonebook/", phonebookBody)
 
     const contactBody = {
         contact: phone,
         full_name: `${firstName} ${lastName}`,
-        phonebook: createPhonebookResponse.data.url,
+        phonebook: createPhonebookResponse.url,
         additional_vars: {
           transfer_number: "0000001"
         }
       };
   
-      const createContactResponse = await axios({
-        method: 'post',
-        url: 'https://dialer.realchat.ai/rest-api/contact/',
-        data: contactBody,
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Basic ${base64Credentials}`
-        },
-        maxRedirects: 0
-      })
+    await callDialerApi("contact/", contactBody)
 
-    return createPhonebookResponse.data
+    return createPhonebookResponse
   } catch (err) {
     console.log('create phonebook failed')
     throw err.message
