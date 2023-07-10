@@ -5,8 +5,15 @@ import runCreateCampaign from './sendAudio/createCampaign'
 
 export default async function handler (req, res) {
   try {
-    const { firstName, lastName, mp3Url, dialerLogin, dialerToken, phone } =
-      req.body
+    const {
+      firstName,
+      lastName,
+      mp3Url,
+      dialerLogin,
+      dialerToken,
+      phone,
+      userId
+    } = req.body
 
     const uploadAudioResponse = await runCreateAudio({
       firstName,
@@ -18,14 +25,16 @@ export default async function handler (req, res) {
     const createSurveyResponse = await runCreateSurvey({
       dialerLogin,
       dialerToken,
-      audio: uploadAudioResponse.id
+      audio: uploadAudioResponse.id,
+      userId
     })
     const createPhonebookResponse = await runCreatePhonebook({
       dialerLogin,
       dialerToken,
       firstName,
       lastName,
-      phone
+      phone,
+      userId
     })
 
     const regex = /\/(\d+)\//
@@ -35,7 +44,8 @@ export default async function handler (req, res) {
     const createCampaignResponse = await runCreateCampaign({
       phonebook: createPhonebookResponse.url,
       survey: surveyId,
-      audio: uploadAudioResponse.id
+      audio: uploadAudioResponse.id,
+      userId
     })
 
     res.status(200).json(createCampaignResponse)

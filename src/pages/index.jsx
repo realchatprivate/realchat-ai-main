@@ -33,7 +33,8 @@ export default function Home () {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
-    if (!isBlank(dialerLogin) && !isBlank(dialerToken)) {
+    const userId = params.get('userId')
+    if (!isBlank(dialerLogin) && !isBlank(dialerToken) && !isBlank(userId)) {
       setParamsDefined(true)
     }
   }, [])
@@ -101,6 +102,7 @@ export default function Home () {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
+    const userId = params.get('userId')
 
     for (const [index, person] of array.entries()) {
       console.log(index)
@@ -109,9 +111,10 @@ export default function Home () {
         mp3Url: mp3[index],
         firstName: person['FirstName'],
         lastName: person['LastName'],
-        dialerLogin: dialerLogin,
-        dialerToken: dialerToken,
-        phone: person['Phone']
+        dialerLogin,
+        dialerToken,
+        phone: person['Phone'],
+        userId
       })
     }
     setMp3Uploaded(mp3)
@@ -123,6 +126,7 @@ export default function Home () {
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
+    const userId = params.get('userId')
 
     setLoadingMp3Uploading([...loadingMp3Uploading, mp3Url])
     const result = await axios.post('/api/sendAudio', {
@@ -131,7 +135,8 @@ export default function Home () {
       lastName,
       dialerLogin,
       dialerToken,
-      phone
+      phone,
+      userId
     })
     setLoadingMp3Uploading(loadingMp3Uploading.filter(item => item !== mp3Url))
 

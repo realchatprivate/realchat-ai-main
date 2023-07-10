@@ -1,16 +1,15 @@
 import { callDialerApi } from './api'
 
 export default async function runCreatePhonebook ({
-  dialerLogin,
-  dialerToken,
   firstName,
   lastName,
-  phone
+  phone,
+  userId
 }) {
   try {
     const phonebookBody = {
       name: Date.now().toString(),
-      user: '/rest-api/users/1/'
+      user: `/rest-api/users/${userId}/`
     }
 
     const createPhonebookResponse = await callDialerApi(
