@@ -30,6 +30,11 @@ export default function Home () {
   const [searchParamsDefined, setParamsDefined] = useState(false)
 
   useEffect(() => {
+    // const listQueuesResponse = await axios.post('/api/listQueues')
+    // console.log(listQueuesResponse.data)
+    axios.post('/api/listQueues').then(response => {
+      console.log(response.data)
+    })
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')

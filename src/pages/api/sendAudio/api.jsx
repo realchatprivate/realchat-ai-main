@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: 'https://dialer.realchat.ai/rest-api/',
   headers: { Accept: 'application/json' },
   auth: {
