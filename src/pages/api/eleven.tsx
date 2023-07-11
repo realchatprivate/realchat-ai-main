@@ -5,8 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 export default async function textToSpeech(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const API_KEY = process.env.API_KEY;
-    const VOICE_ID = 'Lfush8lZN9F1xAjh8pqx';
-    const { prompts } = req.body;
+    const { prompts, modelId } = req.body;
 
     // Configure AWS S3
     const s3 = new S3({
@@ -22,7 +21,7 @@ export default async function textToSpeech(req: NextApiRequest, res: NextApiResp
       for (const prompt of prompts) {
         const options = {
           method: 'POST',
-          url: `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+          url: `https://api.elevenlabs.io/v1/text-to-speech/${modelId}`,
           headers: {
             accept: 'audio/mpeg',
             'content-type': 'application/json',

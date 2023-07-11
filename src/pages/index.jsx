@@ -34,7 +34,8 @@ export default function Home () {
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
     const userId = params.get('userId')
-    if (!isBlank(dialerLogin) && !isBlank(dialerToken) && !isBlank(userId)) {
+    const modelId = params.get('modelId')
+    if (!isBlank(dialerLogin) && !isBlank(dialerToken) && !isBlank(userId) && !isBlank(modelId)) {
       setParamsDefined(true)
     }
   }, [])
@@ -65,10 +66,12 @@ export default function Home () {
   const fetchRequest = async file => {
     setLoading(true)
     const parsedPrompts = array.map(person => parsePrompt(prompt, person))
+    const params = new URLSearchParams(window.location.search)
+    const modelId = params.get('modelId')
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompts: parsedPrompts })
+      body: JSON.stringify({ prompts: parsedPrompts, modelId })
     }
 
     try {
