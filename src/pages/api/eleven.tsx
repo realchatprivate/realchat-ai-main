@@ -7,6 +7,7 @@ export default async function textToSpeech(req: NextApiRequest, res: NextApiResp
     const API_KEY = process.env.API_KEY;
     const { prompts, modelId } = req.body;
 
+
     // Configure AWS S3
     const s3 = new S3({
       region: "us-east-2",
