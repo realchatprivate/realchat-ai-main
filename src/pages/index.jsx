@@ -12,12 +12,15 @@ import {
   Tr,
   Th,
   Td,
-  TableContainer
+  TableContainer,
+  Select,
+  useToast
 } from '@chakra-ui/react'
 import axios from 'axios'
 import Image from 'next/image'
 
 export default function Home () {
+  const toast = useToast()
   const [array, setArray] = useState([])
   const [prompt, setPrompt] = useState(
     'Hi {FirstName} {LastName}! I heard you like {Interests}. Your number is {Phone}.'
@@ -29,23 +32,31 @@ export default function Home () {
   const [file, setFile] = useState(null)
   const [searchParamsDefined, setParamsDefined] = useState(false)
 
+  const [selectedQueue, setSelectedQueue] = useState('')
+  const [availableQueues, setAvailableQueues] = useState([])
+
   useEffect(() => {
-    // const listQueuesResponse = await axios.post('/api/listQueues')
-    // console.log(listQueuesResponse.data)
-    axios.post('/api/listQueues').then(response => {
-      console.log(response.data)
-    })
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
     const userId = params.get('userId')
     const modelId = params.get('modelId')
-    if (!isBlank(dialerLogin) && !isBlank(dialerToken) && !isBlank(userId) && !isBlank(modelId)) {
+    if (
+      !isBlank(dialerLogin) &&
+      !isBlank(dialerToken) &&
+      !isBlank(userId) &&
+      !isBlank(modelId)
+    ) {
       setParamsDefined(true)
     }
   }, [])
 
-  const onChangeHandler = event => {
+  const onChangeHandler = async event => {
+    const listQueuesResponse = await axios.post('/api/listQueues')
+    if (listQueuesResponse?.data?.results?.length > 0) {
+      setAvailableQueues(listQueuesResponse.data.results)
+      console.log(listQueuesResponse.data.results)
+    }
     setFile(event.target.files[0])
     Papa.parse(event.target.files[0], {
       header: true,
@@ -105,7 +116,16 @@ export default function Home () {
   const [err, setErr] = useState('')
 
   const sendAllVoiceMessages = async () => {
-    console.log('sending voice message')
+    if (selectedQueue === '') {
+      toast({
+        title: 'Error',
+        description: "You need to select a queue before sending a phone call.",
+        status: 'warning',
+        duration: 6000,
+        isClosable: true,
+      })
+      return
+    }
     setLoading(true)
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
@@ -131,6 +151,17 @@ export default function Home () {
   }
 
   const sendVoiceMessage = async ({ mp3Url, firstName, lastName, phone }) => {
+    if (selectedQueue === '') {
+      toast({
+        title: 'Error',
+        description: "You need to select a queue before sending a phone call.",
+        status: 'warning',
+        duration: 6000,
+        isClosable: true,
+      })
+      return
+    }
+    setLoading(true)
     const params = new URLSearchParams(window.location.search) // id=123
     const dialerLogin = params.get('dialerLogin')
     const dialerToken = params.get('dialerToken')
@@ -144,9 +175,11 @@ export default function Home () {
       dialerLogin,
       dialerToken,
       phone,
-      userId
+      userId,
+      queue: selectedQueue
     })
     setLoadingMp3Uploading(loadingMp3Uploading.filter(item => item !== mp3Url))
+    setLoading(false)
 
     if (result.status === 200) {
       setMp3Uploaded([...mp3Uploaded, mp3Url])
@@ -227,7 +260,7 @@ export default function Home () {
                   type='button'
                   colorScheme='purple'
                   className='w-full'
-                  isDisabled={array.length === 0}
+                  isDisabled={array.length === 0 || loading}
                   onClick={() => fetchRequest({ prompt: prompt, users: array })}
                 >
                   {loading ? 'Loading...' : 'Generate Speech'}
@@ -235,6 +268,15 @@ export default function Home () {
               )}
             </div>
           </form>
+          {array.length > 0 && (
+            <Select variant='outline' placeholder='Select a Queue' borderColor={'purple.100'} focusBorderColor={'purple.400'} borderWidth={2} marginBottom={5} onChange={(e) => {
+              setSelectedQueue(e.target.value)
+            }}>
+              {availableQueues.length > 0 && availableQueues.map(queue => (
+                <option value={queue.url}>{queue.name}</option>
+              ))}
+            </Select>
+          )}
           <TableContainer>
             <Table variant='simple'>
               <Thead>

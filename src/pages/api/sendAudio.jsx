@@ -12,7 +12,8 @@ export default async function handler (req, res) {
       dialerLogin,
       dialerToken,
       phone,
-      userId
+      userId,
+      queue
     } = req.body
 
     const uploadAudioResponse = await runCreateAudio({
@@ -26,7 +27,8 @@ export default async function handler (req, res) {
       dialerLogin,
       dialerToken,
       audio: uploadAudioResponse.id,
-      userId
+      userId,
+      queue
     })
     const createPhonebookResponse = await runCreatePhonebook({
       dialerLogin,
