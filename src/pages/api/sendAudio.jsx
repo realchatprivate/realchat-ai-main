@@ -21,14 +21,17 @@ export default async function handler (req, res) {
       lastName,
       mp3Url,
       dialerLogin,
-      dialerToken
+      dialerToken,
+      userId
     })
     const createSurveyResponse = await runCreateSurvey({
       dialerLogin,
       dialerToken,
       audio: uploadAudioResponse.id,
       userId,
-      queue
+      queue,
+      dialerLogin,
+      dialerToken
     })
     const createPhonebookResponse = await runCreatePhonebook({
       dialerLogin,
@@ -47,7 +50,9 @@ export default async function handler (req, res) {
       phonebook: createPhonebookResponse.url,
       survey: surveyId,
       audio: uploadAudioResponse.id,
-      userId
+      userId,
+      dialerLogin,
+      dialerToken
     })
 
     res.status(200).json(createCampaignResponse)

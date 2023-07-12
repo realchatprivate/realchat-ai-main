@@ -4,7 +4,9 @@ export default async function runCreateCampaign ({
   phonebook,
   survey,
   audio,
-  userId
+  userId,
+  dialerLogin,
+  dialerToken
 }) {
   try {
     const data = {
@@ -22,7 +24,13 @@ export default async function runCreateCampaign ({
       voicemail_tts: null
     }
 
-    const response = await callDialerApi('campaigns/', data)
+    const response = await callDialerApi(
+      'campaigns/',
+      data,
+      {},
+      process.env.DIALERAI_BASIC_AUTH_LOGIN,
+      process.env.DIALERAI_BASIC_AUTH_PASSWORD
+    )
 
     return response
   } catch (err) {
