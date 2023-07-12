@@ -23,8 +23,8 @@ export default async function runCreateSurvey ({
 
     const createSurveySectionBody = {
       type: '12',
-      audiofile: ``,
-      question: 'Put in queue',
+      audiofile: '',
+      question: 'Ž',
       survey: createSurveyResponse.url,
       queue: queue
     }

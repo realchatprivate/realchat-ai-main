@@ -52,10 +52,17 @@ export default function Home () {
   }, [])
 
   const onChangeHandler = async event => {
+    const params = new URLSearchParams(window.location.search) // id=123
+    const userId = params.get('userId')
     const listQueuesResponse = await axios.post('/api/listQueues')
     if (listQueuesResponse?.data?.results?.length > 0) {
-      setAvailableQueues(listQueuesResponse.data.results)
-      console.log(listQueuesResponse.data.results)
+      const regex = new RegExp('/users/' + userId + '/')
+
+      const filteredQueues = listQueuesResponse.data.results.filter(item =>
+        regex.test(item.user)
+      )
+
+      setAvailableQueues(filteredQueues)
     }
     setFile(event.target.files[0])
     Papa.parse(event.target.files[0], {
@@ -119,10 +126,10 @@ export default function Home () {
     if (selectedQueue === '') {
       toast({
         title: 'Error',
-        description: "You need to select a queue before sending a phone call.",
+        description: 'You need to select a queue before sending a phone call.',
         status: 'warning',
         duration: 6000,
-        isClosable: true,
+        isClosable: true
       })
       return
     }
@@ -154,10 +161,10 @@ export default function Home () {
     if (selectedQueue === '') {
       toast({
         title: 'Error',
-        description: "You need to select a queue before sending a phone call.",
+        description: 'You need to select a queue before sending a phone call.',
         status: 'warning',
         duration: 6000,
-        isClosable: true,
+        isClosable: true
       })
       return
     }
@@ -269,12 +276,21 @@ export default function Home () {
             </div>
           </form>
           {array.length > 0 && (
-            <Select variant='outline' placeholder='Select a Queue' borderColor={'purple.100'} focusBorderColor={'purple.400'} borderWidth={2} marginBottom={5} onChange={(e) => {
-              setSelectedQueue(e.target.value)
-            }}>
-              {availableQueues.length > 0 && availableQueues.map(queue => (
-                <option value={queue.url}>{queue.name}</option>
-              ))}
+            <Select
+              variant='outline'
+              placeholder='Select a Queue'
+              borderColor={'purple.100'}
+              focusBorderColor={'purple.400'}
+              borderWidth={2}
+              marginBottom={5}
+              onChange={e => {
+                setSelectedQueue(e.target.value)
+              }}
+            >
+              {availableQueues.length > 0 &&
+                availableQueues.map(queue => (
+                  <option value={queue.url}>{queue.name}</option>
+                ))}
             </Select>
           )}
           <TableContainer>
