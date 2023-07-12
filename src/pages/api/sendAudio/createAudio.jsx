@@ -18,16 +18,18 @@ const downloadFile = async url => {
   }
 }
 
-const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken) => {
+
+const uploadFile = async (fileBuffer, fileName, dialerLogin, dialerToken, userId) => {
+  console.log(userId)
   const form = new FormData()
   form.append('name', fileName)
   form.append('audio_file', fileBuffer, { filename: `${fileName}.mp3` })
 
   try {
     const headers = {
-      ...form.getHeaders()
+      ...form.getHeaders(),
     }
-    const response = await callDialerApi('audio-files/', form, headers)
+    const response = await callDialerApi('audio-files/', form, headers, dialerLogin, dialerToken)
 
     return response
   } catch (err) {
@@ -42,7 +44,8 @@ export default async function runCreateAudio ({
   lastName,
   mp3Url,
   dialerLogin,
-  dialerToken
+  dialerToken,
+  userId
 }) {
   const fileName = `${Date.now()} ${firstName} ${lastName}`
 
@@ -51,7 +54,8 @@ export default async function runCreateAudio ({
     fileBuffer,
     fileName,
     dialerLogin,
-    dialerToken
+    dialerToken,
+    userId
   )
   return result
 }

@@ -2,7 +2,10 @@ import { callDialerApi } from './api'
 
 export default async function runCreateSurvey ({
   audio,
-  userId
+  userId,
+  queue,
+  dialerLogin,
+  dialerToken
 }) {
   try {
     const createSurveyBody = {
@@ -12,18 +15,27 @@ export default async function runCreateSurvey ({
 
     const createSurveyResponse = await callDialerApi(
       'survey-template/',
-      createSurveyBody
+      createSurveyBody,
+      {},
+      process.env.DIALERAI_BASIC_AUTH_LOGIN,
+      process.env.DIALERAI_BASIC_AUTH_PASSWORD
     )
 
     const createSurveySectionBody = {
-      type: '1',
-      audiofile: `http://dialer.realchat.ai/rest-api/audio-files/${audio}/`,
-      question: 'Play audio',
+      type: '12',
+      audiofile: '',
+      question: 'Ž',
       survey: createSurveyResponse.url,
-      queue: null
+      queue: queue
     }
 
-    await callDialerApi('section-template/', createSurveySectionBody)
+    await callDialerApi(
+      'section-template/',
+      createSurveySectionBody,
+      {},
+      process.env.DIALERAI_BASIC_AUTH_LOGIN,
+      process.env.DIALERAI_BASIC_AUTH_PASSWORD
+    )
 
     return createSurveyResponse
   } catch (err) {

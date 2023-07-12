@@ -4,7 +4,9 @@ export default async function runCreatePhonebook ({
   firstName,
   lastName,
   phone,
-  userId
+  userId,
+  dialerLogin,
+  dialerToken
 }) {
   try {
     const phonebookBody = {
@@ -14,7 +16,10 @@ export default async function runCreatePhonebook ({
 
     const createPhonebookResponse = await callDialerApi(
       'phonebook/',
-      phonebookBody
+      phonebookBody,
+      {},
+      process.env.DIALERAI_BASIC_AUTH_LOGIN,
+      process.env.DIALERAI_BASIC_AUTH_PASSWORD
     )
 
     const contactBody = {
@@ -26,7 +31,7 @@ export default async function runCreatePhonebook ({
       }
     }
 
-    await callDialerApi('contact/', contactBody)
+    await callDialerApi('contact/', contactBody, {}, dialerLogin, dialerToken)
 
     return createPhonebookResponse
   } catch (err) {
